@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 
 const TaskEditor = ({ initialTask, onSave, onCancel }) => {
   const [task, setTask] = useState(initialTask);
@@ -67,18 +66,18 @@ const TaskEditor = ({ initialTask, onSave, onCancel }) => {
   );
 };
 
-TaskEditor.propTypes = {
-  initialTask: PropTypes.shape({
-    taskName: PropTypes.string.isRequired,
-    assignee: PropTypes.string,
-    description: PropTypes.string,
-    priority: PropTypes.string,
-    status: PropTypes.string,
-    dueDate: PropTypes.string,
-    spentTime: PropTypes.string,
-  }).isRequired,
-  onSave: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-};
+// TaskEditor.propTypes = {
+//   initialTask: PropTypes.shape({
+//     taskName: PropTypes.string.isRequired,
+//     assignee: PropTypes.string,
+//     description: PropTypes.string,
+//     priority: PropTypes.string,
+//     status: PropTypes.string,
+//     dueDate: PropTypes.string,
+//     spentTime: PropTypes.string,
+//   }).isRequired,
+//   onSave: PropTypes.func.isRequired,
+//   onCancel: PropTypes.func.isRequired,
+// };
 
 export default TaskEditor;

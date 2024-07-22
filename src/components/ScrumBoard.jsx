@@ -5,6 +5,11 @@ import ExportButton from "./ExportButton";
 import ImportTasks from "./ImportTasks";
 import TaskEditor from "./TaskEditor";
 
+function getCurrentDate() {
+  const today = new Date();
+  return today.toISOString().split("T")[0];
+}
+
 export default function Board() {
   const [editingTask, setEditingTask] = useState(null);
   const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -164,10 +169,14 @@ export default function Board() {
           margin: "0 auto",
         }}
       >
-        {Object.entries(tasks).map(([key, value]) => (
+        {Object.entries(tasks).map(([key, value], index) => (
           <ScrumColumn
             key={key}
-            title={key} // Convert camelCase to readable format
+            title={
+              index === Object.entries(tasks).length - 1
+                ? key.toUpperCase()
+                : key.toUpperCase().replace("IN", "")
+            }
             tasks={value}
             id={key}
             onSave={updateTask}
@@ -181,16 +190,44 @@ export default function Board() {
             {Object.entries(formFields).map(([field, value]) => (
               <label key={field}>
                 {field.replace(/([A-Z])/g, " $1").trim()}:
-                <input
-                  type={field === "description" ? "textarea" : "text"}
-                  value={value}
-                  onChange={(e) =>
-                    setFormFields((prev) => ({
-                      ...prev,
-                      [field]: e.target.value,
-                    }))
-                  }
-                />
+                {field === "priority" ? (
+                  <select
+                    value={value}
+                    onChange={(e) =>
+                      setFormFields((prev) => ({
+                        ...prev,
+                        [field]: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="High">High</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Urgent">Urgent</option>
+                  </select>
+                ) : field === "dueDate" ? (
+                  <input
+                    type="date"
+                    value={value}
+                    min={getCurrentDate()}
+                    onChange={(e) =>
+                      setFormFields((prev) => ({
+                        ...prev,
+                        [field]: e.target.value,
+                      }))
+                    }
+                  />
+                ) : (
+                  <input
+                    type={field === "description" ? "textarea" : "text"}
+                    value={value}
+                    onChange={(e) =>
+                      setFormFields((prev) => ({
+                        ...prev,
+                        [field]: e.target.value,
+                      }))
+                    }
+                  />
+                )}
               </label>
             ))}
             <button type="submit">Submit</button>

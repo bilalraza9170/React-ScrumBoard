@@ -47,6 +47,21 @@ export default function ScrumTask({ task, index, onSave }) {
     setIsEditing(false);
   };
 
+  function getColorByPriority(priority) {
+    switch (priority) {
+      case "High":
+        return "rgb(248,219,187)";
+      case "Normal":
+        return "rgb(208,254,240)";
+      case "Urgent":
+        return "rgb(249,226,228)";
+      default:
+        return "none"; // Default case if no priority matches
+    }
+  }
+
+  const priorityColor = getColorByPriority(task.priority);
+
   return (
     <Draggable draggableId={`${task.id}`} index={index}>
       {(provided, snapshot) => (
@@ -56,6 +71,10 @@ export default function ScrumTask({ task, index, onSave }) {
           ref={provided.innerRef}
           isDragging={snapshot.isDragging}
           onClick={handleCardClick}
+          style={{
+            ...provided.draggableProps.style, // Merge the provided draggable style
+            backgroundColor: priorityColor,
+          }}
         >
           {isEditing ? (
             <TaskEditor
