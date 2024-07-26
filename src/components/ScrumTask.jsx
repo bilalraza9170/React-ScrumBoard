@@ -9,15 +9,25 @@ const Container = styled.div`
   box-shadow: 5px 5px 5px 2px grey;
   padding: 8px;
   color: #000;
-  margin-bottom: 8px;
+  margin: 0 10px 8px 10px;
   min-height: 120px;
-  margin-left: 10px;
-  margin-right: 10px;
   background-color: ${(props) => (props.isDragging ? "lightgreen" : "#EAF4FC")};
   cursor: pointer;
   display: flex;
-  justify-content: space-between;
   flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden; /* Ensure content doesn’t overflow */
+`;
+
+const Content = styled.div`
+  flex: 1; /* Allows content to grow and fill available space */
+  overflow: hidden; /* Hide any overflow */
+`;
+
+const PriorityLabel = styled.span`
+  display: block;
+  font-weight: bold;
+  color: ${(props) => props.color};
 `;
 
 export default function ScrumTask({ task, index, onSave }) {
@@ -27,7 +37,6 @@ export default function ScrumTask({ task, index, onSave }) {
 
   const handleCardClick = () => {
     if (!isEditing) {
-      // Prevent opening modal when in editing mode
       setIsModalOpen(true);
     }
   };
@@ -37,17 +46,16 @@ export default function ScrumTask({ task, index, onSave }) {
   };
 
   const handleEdit = (e) => {
-    // e.stopPropagation(); // Prevent dragging behavior
+    e.stopPropagation(); // Prevent dragging behavior
     setIsEditing(true);
   };
 
   const handleSave = (updatedTask) => {
-    console.log("Saving task:", updatedTask); // Debugging line
     onSave(updatedTask);
     setIsEditing(false);
   };
 
-  function getColorByPriority(priority) {
+  const getColorByPriority = (priority) => {
     switch (priority) {
       case "High":
         return "rgb(248,219,187)";
@@ -56,9 +64,9 @@ export default function ScrumTask({ task, index, onSave }) {
       case "Urgent":
         return "rgb(249,226,228)";
       default:
-        return "none"; // Default case if no priority matches
+        return "none";
     }
-  }
+  };
 
   const priorityColor = getColorByPriority(task.priority);
 
@@ -80,26 +88,36 @@ export default function ScrumTask({ task, index, onSave }) {
             <TaskEditor
               initialTask={editTaskDetails}
               onSave={(updatedTask) => {
-                console.log("TaskEditor onSave:", updatedTask); // Debugging line
                 setEditTaskDetails(updatedTask);
                 handleSave(updatedTask);
               }}
               onCancel={() => setIsEditing(false)}
             />
           ) : (
-            <div>
+            <Content>
               <span>{task.taskName}</span>
-              <br />
-              <span>{task.assignee}</span>
               <br />
               <span>{task.description}</span>
               <br />
-              <span>{task.priority}</span>
+              <PriorityLabel color={priorityColor}>
+                {task.priority}
+              </PriorityLabel>
               <br />
-              <button onClick={handleEdit}>Edit</button>
-            </div>
+              <span>{task.assignee}</span>
+              <br />
+              <button
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleEdit(event);
+                }}
+              >
+                Edit
+              </button>
+            </Content>
           )}
+
           {provided.placeholder}
+
           <TaskDetailModal
             isOpen={isModalOpen}
             onClose={closeModal}

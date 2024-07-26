@@ -4,6 +4,7 @@ import ScrumColumn from "./ScrumColumn";
 import ExportButton from "./ExportButton";
 import ImportTasks from "./ImportTasks";
 import TaskEditor from "./TaskEditor";
+import TaskForm from "./AddTaskForm";
 
 function getCurrentDate() {
   const today = new Date();
@@ -38,6 +39,10 @@ export default function Board() {
     setEditingTask(task);
   };
 
+  const handleAddTaskClick = () => {
+    setShowAddTaskModal(true);
+  };
+
   const [formFields, setFormFields] = useState({
     taskName: "",
     assignee: "",
@@ -48,23 +53,25 @@ export default function Board() {
     spentTime: "",
   });
 
-  const handleAddTaskClick = () => {
-    setShowAddTaskModal(true);
+  const handleAddTask = (newTaskData) => {
+    const newTask = {
+      id: Math.random(), // Generate unique ID
+      ...newTaskData,
+      isEditing: false,
+    };
+
+    setTasks((prevTasks) => ({
+      ...prevTasks,
+      inBacklog: [newTask, ...prevTasks.inBacklog],
+    }));
+
+    setShowAddTaskModal(false);
+    console.log("Adding task:", newTask);
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const newTask = {
-      id: Math.random(), // Generate unique ID
-      ...formFields,
-      isEditing: false,
-    };
-    setTasks((prev) => ({
-      ...prev,
-      inBacklog: [newTask, ...prev.inBacklog],
-    }));
-    resetFormFields();
-    setShowAddTaskModal(false);
+    handleAddTask(formFields);
   };
 
   const resetFormFields = () => {
@@ -158,7 +165,11 @@ export default function Board() {
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <h2 style={{ textAlign: "center" }}>AGILE SCRUM BOARD</h2>
-
+      <div>
+        <button onClick={handleAddTaskClick}>Add Task</button>
+        <ExportButton tasks={Object.values(tasks).flat()} />
+        <ImportTasks onFileUpload={handleFileUpload} />
+      </div>
       <div
         style={{
           display: "flex",
@@ -169,13 +180,19 @@ export default function Board() {
           margin: "0 auto",
         }}
       >
-        {Object.entries(tasks).map(([key, value], index) => (
+        {Object.entries(tasks).map(([key, value]) => (
           <ScrumColumn
             key={key}
             title={
-              index === Object.entries(tasks).length - 1
-                ? key.toUpperCase()
-                : key.toUpperCase().replace("IN", "")
+              key === "qaInProgress"
+                ? key
+                    .replace(/([A-Z])/g, " $1")
+                    .trim()
+                    .replace("qa", "QA")
+                : key
+                    .replace(/([A-Z])/g, " $1")
+                    .trim()
+                    .replace("in", "")
             }
             tasks={value}
             id={key}
@@ -185,54 +202,10 @@ export default function Board() {
       </div>
 
       {showAddTaskModal && (
-        <div>
-          <form onSubmit={handleFormSubmit}>
-            {Object.entries(formFields).map(([field, value]) => (
-              <label key={field}>
-                {field.replace(/([A-Z])/g, " $1").trim()}:
-                {field === "priority" ? (
-                  <select
-                    value={value}
-                    onChange={(e) =>
-                      setFormFields((prev) => ({
-                        ...prev,
-                        [field]: e.target.value,
-                      }))
-                    }
-                  >
-                    <option value="High">High</option>
-                    <option value="Normal">Normal</option>
-                    <option value="Urgent">Urgent</option>
-                  </select>
-                ) : field === "dueDate" ? (
-                  <input
-                    type="date"
-                    value={value}
-                    min={getCurrentDate()}
-                    onChange={(e) =>
-                      setFormFields((prev) => ({
-                        ...prev,
-                        [field]: e.target.value,
-                      }))
-                    }
-                  />
-                ) : (
-                  <input
-                    type={field === "description" ? "textarea" : "text"}
-                    value={value}
-                    onChange={(e) =>
-                      setFormFields((prev) => ({
-                        ...prev,
-                        [field]: e.target.value,
-                      }))
-                    }
-                  />
-                )}
-              </label>
-            ))}
-            <button type="submit">Submit</button>
-          </form>
-        </div>
+        <TaskForm
+          addTask={handleAddTask}
+          setShowAddTaskModal={setShowAddTaskModal}
+        />
       )}
 
       {editingTask && (
@@ -242,12 +215,6 @@ export default function Board() {
           onCancel={() => setEditingTask(null)}
         />
       )}
-
-      <button onClick={handleAddTaskClick}>Add Task</button>
-      <br />
-      <ExportButton tasks={Object.values(tasks).flat()} />
-      <ImportTasks onFileUpload={handleFileUpload} />
-      <br />
     </DragDropContext>
   );
 }

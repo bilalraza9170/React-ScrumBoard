@@ -9,9 +9,7 @@ function ImportTasks({ onFileUpload }) {
   };
 
   return (
-    <div>
       <input type="file" accept=".json" onChange={handleFileUpload} />
-    </div>
   );
 }
 

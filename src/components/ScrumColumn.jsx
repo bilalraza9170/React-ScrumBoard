@@ -28,6 +28,13 @@ const TaskList = styled.div`
   min-height: 100px;
 `;
 
+const SearchInput = styled.input`
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: lightyellow;
+`;
+
 export default function ScrumColumn({ title, tasks, id, onSave }) {
   const handleSaveTask = (updatedTask) => {
     onSave(updatedTask); // Handle task saving in the parent component
@@ -38,6 +45,8 @@ export default function ScrumColumn({ title, tasks, id, onSave }) {
       <Title>
         {title} ({tasks.length})
       </Title>
+      {id === "inBacklog" && <SearchInput type="text" placeholder="Search.." />}
+
       <Droppable droppableId={id}>
         {(provided, snapshot) => (
           <TaskList

@@ -3,21 +3,20 @@ import styled from "styled-components";
 
 const ModalWrapper = styled.div`
   position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.4);
+  left: 500px;
+  top: 100px;
+  width: 700px;
+  z-index: 100;
+  height: 100;
 `;
 
 const ModalContent = styled.div`
   background-color: #fefefe;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   margin: 15% auto;
   padding: 20px;
-  border: 1px solid #888;
   width: 80%;
+  overflow: hidden; /* Hide any overflow */
 `;
 
 const ModalCloseButton = styled.button`
@@ -33,6 +32,7 @@ const TaskDetailModal = ({ isOpen, onClose, task }) => {
   return (
     <ModalWrapper onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
+        <ModalCloseButton onClick={onClose}>&times;</ModalCloseButton>
         <h2>{task.taskName}</h2>
         <p>
           <strong>Description:</strong> {task.description}
@@ -52,7 +52,6 @@ const TaskDetailModal = ({ isOpen, onClose, task }) => {
         <p>
           <strong>Spent Time:</strong> {task.spentTime}
         </p>
-        <ModalCloseButton onClick={onClose}>&times;</ModalCloseButton>
       </ModalContent>
     </ModalWrapper>
   );
